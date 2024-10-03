@@ -1,4 +1,3 @@
-Here's the formatted content for the GitHub README file:
 
 ```markdown
 # Maze-Game-Data-Structures-Assignment
