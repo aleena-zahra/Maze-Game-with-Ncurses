@@ -305,7 +305,8 @@ class Player{
             this->hasKey = false;
         }
         int calculateManhattanDistance(Cell* object){
-            return object->xCor - xCor + object->yCor - yCor;
+            return abs(object->xCor - xCor) + abs(object->yCor - yCor);
+
         }
         void senseDistance(Cell* key, Cell* door){
             int distance = calculateManhattanDistance(key);
