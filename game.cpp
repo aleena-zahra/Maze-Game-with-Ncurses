@@ -12,7 +12,7 @@ struct Node{
         this->link = NULL;
     }
     ~Node(){
-        cout<<"\ndestructor called for node with value: "<<this->xCor;
+       // cout<<"\ndestructor called for node with value: "<<this->xCor;
     }
 };
 class List{
@@ -164,7 +164,7 @@ class List{
         cout<<endl;
         Node *temp = head;
         while(temp!=NULL){
-            cout<<temp->xCor<<" -> ";
+            cout<<temp->xCor<<","<<temp->yCor<<"->";
             
             temp = temp->link;
             
@@ -336,10 +336,12 @@ class Maze{
     Player player;
     Cell** maze;
     int width, height;
+    bool playing;
     Grid grid;
         Maze(int width, int height): player(0, 0),grid(width, height){
             this->width = width;
             this->height = height;
+            this->playing = true;
             initMaze();
         }
         void initMaze(){
@@ -398,6 +400,7 @@ class Maze{
             if(player.xCor == grid.bomb->xCor && player.yCor == grid.bomb->yCor){
                 //game over
                 cout<<"Game Over";
+                playing = false;
             }
             else if(player.xCor == grid.coin->xCor && player.yCor == grid.coin->yCor){
                 //increase score of player
@@ -414,6 +417,7 @@ class Maze{
                 if(player.hasKey){
                     //game won
                     cout<<"Game Won";
+                    playing = false;
                 }
                 else{
                     cout<<"You need a key to open the door";
@@ -425,16 +429,19 @@ int main(){
     Maze maze(6,6);
     char direction;
     int moves = 36;
-    while(moves--){
-    cout<<"Enter direction: ";
-    cin>>direction;
-    if(direction == 'u'){
-        maze.undoMove();
+    while(moves--&&maze.playing){
+        cout<<"Enter direction: ";
+        cin>>direction;
+        if(direction == 'u'){
+            maze.undoMove();
+        }
+        maze.move(direction);
+        maze.player.senseDistance(maze.grid.key,maze.grid.door);
+        maze.drawMaze();
+        maze.checkCollision();
     }
-    maze.move(direction);
-    maze.player.senseDistance(maze.grid.key,maze.grid.door);
-    maze.drawMaze();
-    maze.checkCollision();
-    }
+    maze.player.coinsCollected.printList();
+    maze.player.prevPositions.printList();
     return 0;
 }
+
