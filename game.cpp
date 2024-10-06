@@ -1,3 +1,7 @@
+
+#include<ncurses.h>
+#include<random>
+#include<cmath>
 #include<iostream>
 using namespace std;
 
@@ -12,8 +16,9 @@ struct Node{
         this->link = NULL;
     }
     ~Node(){
-       // cout<<"\ndestructor called for node with value: "<<this->xCor;
+       // printw("\ndestructor called for node with value: "<<this->xCor;
     }
+    
 };
 class List{
     private:
@@ -99,15 +104,17 @@ class List{
         return head==NULL;
     }
     void printList(){
-        cout<<endl;
+        printw("\n");
         Node *temp = head;
         while(temp!=NULL){
-            cout<<temp->xCor<<","<<temp->yCor<<"->";
+
+            printw("(%d , %d) ->", temp->xCor, temp->yCor);
             
             temp = temp->link;
             
         }
-        cout<<"NULL\n";
+        printw("NULL\n");
+        refresh();
     }
     Node* peek(){
         return head;
@@ -169,7 +176,7 @@ class Grid{
             for (int j =width-1 ; j>=0 ; j--){
                 insertNodeAtHead(j,i);
             }
-            cout<<endl;
+            printw("\n");
      }
         //connect the cells in each linked list
         //connect the linked lists by connecting their heads
@@ -205,7 +212,7 @@ class Grid{
             }
             temp = temp->right;
         }
-        cout<<"Index Not Found";
+        printw("Index Not Found");
         return NULL;
     }
     Cell* setIndex(int x, int y, char type){
@@ -219,14 +226,14 @@ class Grid{
         for (int i =0 ; i<height;i++){
             Cell *temp = heads[i];
             while (temp!=NULL){
-              //  cout<<"( "<<temp->xCor<<","<<temp->yCor<<" ) ";
-              cout<<"|"<<temp->cellType;
+              //  printw("( "<<temp->xCor<<","<<temp->yCor<<" ) ";
+              printw("|%c",temp->cellType);
                 temp = temp->right;
             }
-            cout<<"|";
-            cout<<endl;
+            printw("|");
+            printw("\n");
         }
-        cout<<endl;
+        printw("\n");
     }
 };
 //player class
@@ -292,7 +299,8 @@ class Maze{
             this->playing = true;
             initMaze();
             moves = calculateMoves();
-            cout<<"initially moves are"<<moves<<endl;
+            printw("initially moves are %d\n",moves);
+            refresh();
             calculateUndoMoves();
         }
         void initMaze(){
@@ -314,7 +322,7 @@ class Maze{
                 case 'u':
                     if(player.canUndo())
                     undoMove();
-                    else cout<<"Out of undos";
+                    else {printw("Out of undos\n"); refresh();}
                     break;
                 case 'w':
                 //if previouly opposite direction was entered, dont move
@@ -346,7 +354,8 @@ class Maze{
                     directionSet = true;
                     break;
             }
-            cout<<"Moves left: "<<moves<<endl;
+            printw("Moves left: %d\n",moves);
+            refresh();
             checkBoundary();
             updatePlayer(prevX,prevY);
             if(directionSet) player.pushPosition(prevX,prevY);
@@ -374,30 +383,31 @@ class Maze{
         void checkCollision(){
             if(player.xCor == grid.bomb->xCor && player.yCor == grid.bomb->yCor){
                 //game over
-                cout<<"Game Over";
+                printw("Game Over");
                 playing = false;
             }
             else if(player.xCor == grid.coin->xCor && player.yCor == grid.coin->yCor){
                 //increase score of player
                 //add coin cordinates to players list
-                cout<<"Coin Collected";
+                printw("Coin Collected\n");
                 player.collectCoin(player.xCor,player.yCor);
             }
             else if(player.xCor == grid.key->xCor && player.yCor == grid.key->yCor){
                 player.hasKey = true;
-                cout<<"Key Collected";
+                printw("Key Collected\n");
                 
             }
             else if(player.xCor == grid.door->xCor && player.yCor == grid.door->yCor){
                 if(player.hasKey){
                     //game won
-                    cout<<"Game Won";
+                    printw("Game Won");
                     playing = false;
                 }
                 else{
-                    cout<<"You need a key to open the door";
+                    printw("You need a key to open the door");
                 }
             }
+            refresh();
         }
         int calculateMoves(){
             int moves = 0;
@@ -407,8 +417,9 @@ class Maze{
             else if(mode==2){
                 moves = 2;
             }
-            cout<<"Key at "<<grid.key->xCor<<","<<grid.key->yCor<<endl;
-            cout<<"Door at "<<grid.door->xCor<<","<<grid.door->yCor<<endl;
+            printw("Key at %d , %d\n",grid.key->xCor,grid.key->yCor);
+            printw("Door at %d , %d\n",grid.door->xCor,grid.door->yCor);
+            
             this->distanceOfPlayer = calculateManhattanDistance(grid.key);
             return distanceOfPlayer + calculateManhattanDistance(grid.key,grid.door) +moves;
         }
@@ -424,11 +435,11 @@ class Maze{
             if(player.hasKey) distance = calculateManhattanDistance(grid.door);
             else distance = calculateManhattanDistance(grid.key);
 
-            if(distance<this->distanceOfPlayer)
-                cout << "Getting warmer!" << endl;
-            else if(distance>this->distanceOfPlayer)
-                cout << "Getting colder!" << endl;
-            
+            if(distance < this->distanceOfPlayer)
+                printw("Getting warmer!\n");
+            else if(distance > this->distanceOfPlayer)
+                printw("Getting colder!\n");
+            refresh();
             this->distanceOfPlayer = distance;
         }
         void calculateUndoMoves(){
@@ -446,19 +457,41 @@ class Maze{
             return moves==0 || !playing;
         } 
 };
+
 int main(){
+    initscr();   
+// Print to the screen
+    cbreak();             // Disable line buffering
+    noecho(); 
+    // Refresh the screen
+    refresh();
+    
     Maze maze(1);
     char direction;
-    maze.drawMaze();
+    
     while(!maze.checkGameOver()){
-        cout<<"Enter direction: ";
-        cin>>direction;
+        printw("Can you escape from the maze of mysteries?");
+        printw("Score: %d\n",maze.player.score);
+        printw("Moves left: %d\n",maze.moves);
+        printw("Undo Moves left: %d\n",maze.player.undoMoves);
+        maze.drawMaze();
+        printw("Enter direction: ");
+        direction = getch();
         maze.move(direction);
         maze.senseDistance(maze.grid.key,maze.grid.door);
-        maze.drawMaze();
+        clear();
+
+        refresh();
         maze.checkCollision();
+        
     }
     maze.player.coinsCollected.printList();
     maze.player.prevPositions.printList();
+    //refresh();
+    // Wait for a key press
+    getch();
+    //ends ncurses
+    endwin();
+    
     return 0;
 }
