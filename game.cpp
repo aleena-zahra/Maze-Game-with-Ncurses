@@ -32,8 +32,8 @@ class List{
         }
         head = NULL;
     }
-    
-    void insertAtHead(int xCor,int yCor){
+//insert functions    
+    void push(int xCor,int yCor){
         //create new node and set its values
         Node* newNode = new Node(xCor,yCor);
 
@@ -46,7 +46,7 @@ class List{
             head = newNode;
         }
     }
-    void insertAtEnd(int xCor,int yCor){
+    void enqueue(int xCor,int yCor){
         //make the nodee
         Node *temp = new Node(xCor,yCor);
         //if empty list
@@ -62,32 +62,9 @@ class List{
         }
         //traverse until current->next ==NULL
     }
-    bool insertAfterPosition(int position,int xCor,int yCor){
-        Node *newNode = new Node(xCor,yCor);
-        if(position< 0){
-            return false;
-        }
-        if(position == 0){
-            insertAtHead(xCor,yCor);
-        }
-        else{
-            int index =0;
-            Node *current = head;
-            Node *next;
-            while(current->link!=NULL && index<position){
-                current = current->link;
-                index++;
-            }
-            next = current->link;
-            current->link = newNode;
-            newNode->link = next;
-            
-        }
-        return true;
-    }
-    
+  
     //delete functions
-    void deleteAtStart(){
+    void pop(){
         if(!isEmpty()){
             Node *temp = head; //store old head/first node
             head = head->link; //new head is next node
@@ -100,7 +77,7 @@ class List{
         }
         //only 1 node
         if (head->link == NULL) {
-            deleteAtStart();
+            pop();
             return true;
         }
         //delete from end when nodes>1
@@ -118,45 +95,6 @@ class List{
         return true;
     }
 
-    bool deleteAtIndex(int position){
-        if(position<0){
-            return false;
-        }
-        if(position==0){
-            deleteAtStart();
-            return true;
-        }
-        Node *current = head;
-        Node *previous = NULL;
-        int index = 0;
-        while (current->link->link != NULL && index<position) {
-            previous = current;
-            current = current->link;
-            index++;
-        }
-        previous->link = current->link;
-        // Delete the node
-        delete current;
-        return true;
-    }
-    bool deleteAtValue(int value){
-        if(head->xCor == value){
-            deleteAtStart();
-            return true;
-        }
-        Node *current = head;
-        Node *previous = NULL;
-
-        while (current->link->link != NULL && current->xCor!=value && current->yCor!=value) {
-            previous = current;
-            current = current->link;
-        }
-        previous->link = current->link;
-        // Delete the node
-        delete current;
-        return true;
-    }
-
     bool isEmpty(){
         return head==NULL;
     }
@@ -171,7 +109,7 @@ class List{
         }
         cout<<"NULL\n";
     }
-    Node* getHead(){
+    Node* peek(){
         return head;
     }
     
@@ -199,9 +137,8 @@ class Grid{
     Cell *door, *key;
     Cell *bomb, *coin;
     int width, height;
-    Grid(int w=6, int h=6){
-        this->width = w;
-        this->height = h;
+    Grid(int mode=1){
+        this->width = this->height = (mode+1)*5;
         heads = new Cell*[height];
         for (int i =0 ; i<height;i++){
             heads[i] = NULL;
@@ -298,38 +235,35 @@ class Player{
     int xCor, yCor,distance;
     List coinsCollected,prevPositions;
     bool hasKey;
-    
-        Player(int xCor=0, int yCor=0){
+    int undoMoves;
+    int score;
+        Player(int xCor=0, int yCor=0,int undoMoves=6){
             this->xCor = xCor;
             this->yCor = yCor;
             this->hasKey = false;
-        }
-        int calculateManhattanDistance(Cell* object){
-            return abs(object->xCor - xCor) + abs(object->yCor - yCor);
-
-        }
-        void senseDistance(Cell* key, Cell* door){
-            int distance = calculateManhattanDistance(key);
-            if(distance<this->distance){
-                cout << "Getting warmer!" << endl;
-            }else if(distance>this->distance){
-                cout << "Getting colder!" << endl;
-            }
-            this->distance = distance;
+            this->undoMoves= undoMoves;
         }
         void collectCoin(int xCor,int yCor){
-            coinsCollected.insertAtEnd(xCor,yCor);
+            coinsCollected.enqueue(xCor,yCor);
+            undoMoves++;
             //update the score on terminal
         }
         void pushPosition(int xCor,int yCor){
-            prevPositions.insertAtHead(xCor,yCor);
+            prevPositions.push(xCor,yCor);
         }
         void undoMove(){
-            Node* prev = prevPositions.getHead();
+            Node* prev = prevPositions.peek();
             xCor = prev->xCor;
             yCor = prev->yCor;
-            prevPositions.deleteAtStart();
+            prevPositions.pop();
+            undoMoves--;
         }
+        void setUndoMoves(int moves){
+            undoMoves = moves;
+        }
+        bool canUndo(){
+            return undoMoves>0;
+        } 
 };
 //maze class
 class Maze{
@@ -338,12 +272,18 @@ class Maze{
     Cell** maze;
     int width, height;
     bool playing;
+    int distanceOfPlayer;
     Grid grid;
-        Maze(int width, int height): player(0, 0),grid(width, height){
-            this->width = width;
-            this->height = height;
+    int mode; //1 for easy, 2 for medium, 3 for hard
+    int moves;
+        Maze(int mode): player(0, 0),grid(mode){
+            this->mode = mode;
+            this->width = this->height = (mode+1)*5;
             this->playing = true;
             initMaze();
+            moves = calculateMoves();
+            cout<<"initially moves are"<<moves<<endl;
+            calculateUndoMoves();
         }
         void initMaze(){
             grid.setIndex(player.xCor,player.yCor,'P');
@@ -360,22 +300,33 @@ class Maze{
             int prevX = player.xCor;
             int prevY = player.yCor;
             switch(direction){
+                case 'u':
+                    if(player.canUndo())
+                    undoMove();
+                    else cout<<"Out of undos";
+                    break;
                 case 'w':
+                //if previouly opposite direction was entered, dont move
                     player.yCor--;
+                    moves--;
                     break;
                 case 's':
                     player.yCor++;
+                    moves--;
                     break;
                 case 'a':
                     player.xCor--;
+                    moves--;
                     break;
                 case 'd':
                     player.xCor++;
+                    moves--;
                     break;
             }
+            cout<<"Moves left: "<<moves<<endl;
             checkBoundary();
             updatePlayer(prevX,prevY);
-            player.pushPosition(prevX,prevY);
+            if(direction!='u') player.pushPosition(prevX,prevY);
 
         }
         void undoMove(){
@@ -425,19 +376,62 @@ class Maze{
                 }
             }
         }
+        int calculateMoves(){
+            int moves = 0;
+            if(mode==1){
+                moves = 6;
+            }
+            else if(mode==2){
+                moves = 2;
+            }
+            cout<<"Key at "<<grid.key->xCor<<","<<grid.key->yCor<<endl;
+            cout<<"Door at "<<grid.door->xCor<<","<<grid.door->yCor<<endl;
+            this->distanceOfPlayer = calculateManhattanDistance(grid.key);
+            return distanceOfPlayer + calculateManhattanDistance(grid.key,grid.door) +moves;
+        }
+        int calculateManhattanDistance(Cell* object){
+            return abs(object->xCor - player.xCor) + abs(object->yCor - player.yCor);
+
+        }
+        int calculateManhattanDistance(Cell* key, Cell* door){return abs(door->xCor - key->xCor) + abs(door->yCor - key->yCor);
+
+        }
+        void senseDistance(Cell* key, Cell* door){
+            int distance=0;
+            if(player.hasKey) distance = calculateManhattanDistance(grid.door);
+            else distance = calculateManhattanDistance(grid.key);
+
+            if(distance<this->distanceOfPlayer)
+                cout << "Getting warmer!" << endl;
+            else if(distance>this->distanceOfPlayer)
+                cout << "Getting colder!" << endl;
+            
+            this->distanceOfPlayer = distance;
+        }
+        void calculateUndoMoves(){
+            if (mode==1){
+                player.setUndoMoves(6);
+            }
+            else if(mode==2){
+                player.setUndoMoves(4);
+            }
+            else if(mode==3){
+                player.setUndoMoves(1);
+            }
+        }
+        bool checkGameOver(){
+            return moves==0 || !playing;
+        } 
 };
 int main(){
-    Maze maze(6,6);
+    Maze maze(1);
     char direction;
-    int moves = 36;
-    while(moves--&&maze.playing){
+    maze.drawMaze();
+    while(!maze.checkGameOver()){
         cout<<"Enter direction: ";
         cin>>direction;
-        if(direction == 'u'){
-            maze.undoMove();
-        }
         maze.move(direction);
-        maze.player.senseDistance(maze.grid.key,maze.grid.door);
+        maze.senseDistance(maze.grid.key,maze.grid.door);
         maze.drawMaze();
         maze.checkCollision();
     }
@@ -445,4 +439,3 @@ int main(){
     maze.player.prevPositions.printList();
     return 0;
 }
-
