@@ -237,15 +237,19 @@ class Player{
     bool hasKey;
     int undoMoves;
     int score;
+    char playerDirection;
         Player(int xCor=0, int yCor=0,int undoMoves=6){
             this->xCor = xCor;
             this->yCor = yCor;
             this->hasKey = false;
             this->undoMoves= undoMoves;
+            this->score = 0;
+            this->playerDirection = ' ';
         }
         void collectCoin(int xCor,int yCor){
             coinsCollected.enqueue(xCor,yCor);
             undoMoves++;
+            score++;
             //update the score on terminal
         }
         void pushPosition(int xCor,int yCor){
@@ -264,6 +268,12 @@ class Player{
         bool canUndo(){
             return undoMoves>0;
         } 
+        void setPlayerDirection(char direction){
+            playerDirection = direction;
+        }
+        char getPlayerDirection(){
+            return playerDirection;
+        }
 };
 //maze class
 class Maze{
@@ -299,6 +309,7 @@ class Maze{
         void  move(char direction){
             int prevX = player.xCor;
             int prevY = player.yCor;
+            bool directionSet = false;
             switch(direction){
                 case 'u':
                     if(player.canUndo())
@@ -307,26 +318,38 @@ class Maze{
                     break;
                 case 'w':
                 //if previouly opposite direction was entered, dont move
+                    if(player.getPlayerDirection()=='s') break;
                     player.yCor--;
                     moves--;
+                    player.setPlayerDirection('w');
+                    directionSet = true;
                     break;
                 case 's':
+                    if(player.getPlayerDirection()=='w') break;
                     player.yCor++;
                     moves--;
+                    player.setPlayerDirection('s');
+                    directionSet = true;
                     break;
                 case 'a':
+                    if(player.getPlayerDirection()=='d') break;
                     player.xCor--;
                     moves--;
+                    player.setPlayerDirection('a');
+                    directionSet = true;
                     break;
                 case 'd':
+                    if(player.getPlayerDirection()=='a') break;
                     player.xCor++;
                     moves--;
+                    player.setPlayerDirection('d');
+                    directionSet = true;
                     break;
             }
             cout<<"Moves left: "<<moves<<endl;
             checkBoundary();
             updatePlayer(prevX,prevY);
-            if(direction!='u') player.pushPosition(prevX,prevY);
+            if(directionSet) player.pushPosition(prevX,prevY);
 
         }
         void undoMove(){
