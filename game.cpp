@@ -142,14 +142,18 @@ class Grid{
     public:
     Cell **heads;
     Cell *door, *key;
-    Cell *bomb, *coin;
+    Cell **bomb, **coin;
     int width, height;
+    int numOfItems;
     Grid(int mode=1){
         this->width = this->height = (mode+1)*5;
         heads = new Cell*[height];
         for (int i =0 ; i<height;i++){
             heads[i] = NULL;
         }
+        numOfItems = mode*2;
+        bomb = new Cell*[numOfItems];
+        coin = new Cell*[numOfItems];
         makeGrid();
         
     }
@@ -200,8 +204,10 @@ class Grid{
         // Generate random coordinates for bomb, coin, key, and door
             key = setIndex(rand() % height,rand() % width,' ');
             door = setIndex(rand() % height,rand() % width,' ');
-            bomb = setIndex(rand() % height,rand() % width,'b');
-            coin = setIndex(rand() % height,rand() % width,'c');
+            for (int i =0 ; i<numOfItems;i++){
+            bomb[i] = setIndex(rand() % height,rand() % width,'b');
+            coin[i] = setIndex(rand() % height,rand() % width,'c');
+            }
             
     }
     Cell* getIndex(int x, int y){
@@ -221,6 +227,22 @@ class Grid{
             cell->cellType = type;
         }
         return cell;
+    }
+    bool playerAndBombCollision(int xCor, int yCor){
+        for (int i =0 ; i<numOfItems;i++){
+            if (bomb[i]->xCor == xCor && bomb[i]->yCor == yCor){
+                return true;
+            }
+        }
+        return false;
+    }
+    bool playerAndCoinCollision(int xCor, int yCor){
+        for (int i =0 ; i<numOfItems;i++){
+            if (coin[i]->xCor == xCor && coin[i]->yCor == yCor){
+                return true;
+            }
+        }
+        return false;
     }
     void printGrid(){
         for (int i =0 ; i<height;i++){
@@ -381,33 +403,37 @@ class Maze{
             }
         }
         void checkCollision(){
-            if(player.xCor == grid.bomb->xCor && player.yCor == grid.bomb->yCor){
+            if(grid.playerAndBombCollision(player.xCor,player.yCor)){
                 //game over
                 printw("Game Over");
+                refresh();
                 playing = false;
             }
-            else if(player.xCor == grid.coin->xCor && player.yCor == grid.coin->yCor){
+            else if(grid.playerAndCoinCollision(player.xCor,player.yCor)){
                 //increase score of player
                 //add coin cordinates to players list
                 printw("Coin Collected\n");
+                refresh();
                 player.collectCoin(player.xCor,player.yCor);
             }
             else if(player.xCor == grid.key->xCor && player.yCor == grid.key->yCor){
                 player.hasKey = true;
                 printw("Key Collected\n");
+                refresh();
                 
             }
             else if(player.xCor == grid.door->xCor && player.yCor == grid.door->yCor){
                 if(player.hasKey){
                     //game won
                     printw("Game Won");
+                    refresh();
                     playing = false;
                 }
                 else{
                     printw("You need a key to open the door");
+                    refresh();
                 }
             }
-            refresh();
         }
         int calculateMoves(){
             int moves = 0;
@@ -417,8 +443,8 @@ class Maze{
             else if(mode==2){
                 moves = 2;
             }
-            printw("Key at %d , %d\n",grid.key->xCor,grid.key->yCor);
-            printw("Door at %d , %d\n",grid.door->xCor,grid.door->yCor);
+            printw("Key at %d , %d\n",grid.key->yCor,grid.key->xCor);
+            printw("Door at %d , %d\n",grid.door->yCor,grid.door->xCor);
             
             this->distanceOfPlayer = calculateManhattanDistance(grid.key);
             return distanceOfPlayer + calculateManhattanDistance(grid.key,grid.door) +moves;
@@ -430,17 +456,17 @@ class Maze{
         int calculateManhattanDistance(Cell* key, Cell* door){return abs(door->xCor - key->xCor) + abs(door->yCor - key->yCor);
 
         }
-        void senseDistance(Cell* key, Cell* door){
+        bool senseDistance(Cell* key, Cell* door){
             int distance=0;
             if(player.hasKey) distance = calculateManhattanDistance(grid.door);
             else distance = calculateManhattanDistance(grid.key);
 
-            if(distance < this->distanceOfPlayer)
-                printw("Getting warmer!\n");
-            else if(distance > this->distanceOfPlayer)
-                printw("Getting colder!\n");
-            refresh();
+            if(distance < this->distanceOfPlayer){
+                this->distanceOfPlayer = distance;
+                return true;
+            }
             this->distanceOfPlayer = distance;
+            return false;
         }
         void calculateUndoMoves(){
             if (mode==1){
@@ -470,7 +496,7 @@ int main(){
     char direction;
     
     while(!maze.checkGameOver()){
-        printw("Can you escape from the maze of mysteries?");
+        clear();
         printw("Score: %d\n",maze.player.score);
         printw("Moves left: %d\n",maze.moves);
         printw("Undo Moves left: %d\n",maze.player.undoMoves);
@@ -478,14 +504,24 @@ int main(){
         printw("Enter direction: ");
         direction = getch();
         maze.move(direction);
-        maze.senseDistance(maze.grid.key,maze.grid.door);
-        clear();
-
+        bool closer = maze.senseDistance(maze.grid.key,maze.grid.door);
+        if(closer){
+            printw("Getting warmer\n");
+        }
+        else{
+            printw("Getting colder\n");
+        }
         refresh();
         maze.checkCollision();
+        napms(2000); 
         
     }
+    
+    printw("Key at %d , %d\n",maze.grid.key->yCor,maze.grid.key->xCor);
+    printw("Door at %d , %d\n",maze.grid.door->yCor,maze.grid.door->xCor);
+    printw("Coins Collected: \n");
     maze.player.coinsCollected.printList();
+    printw("Previous Positions: \n");
     maze.player.prevPositions.printList();
     //refresh();
     // Wait for a key press
