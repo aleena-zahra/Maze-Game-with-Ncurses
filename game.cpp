@@ -1,13 +1,10 @@
 
 #include <ncurses.h>
+#include <random>
+#include <cmath>
 #include <iostream>
 using namespace std;
-unsigned int long next = 1;
-int getRandomNum()
-{
-    next = next * 1103515245 + 12345;
-    return((unsigned)(next/65536) % 32768);
-}
+
 // list class
 struct Node
 {
@@ -166,13 +163,12 @@ struct Cell
 };
 class Grid
 {
+public:
     Cell **heads;
     Cell *door, *key;
     Cell **bomb, **coin;
     int width, height;
     int numOfItems;
-
-public:
     Grid(int mode = 1)
     {
         this->width = this->height = (mode + 1) * 5;
@@ -186,16 +182,6 @@ public:
         coin = new Cell *[numOfItems];
         makeGrid();
     }
-    // getter functions for members
-    Cell *getKey()
-    {
-        return key;
-    }
-    Cell *getDoor()
-    {
-        return door;
-    }
-
     void insertNodeAtHead(int xCor, int yCor)
     {
         // create new Carriage and set its values
@@ -248,12 +234,12 @@ public:
     void setItems()
     {
         // Generate random coordinates for bomb, coin, key, and door
-        key = setIndex(getRandomNum() % height, getRandomNum() % width, ' ');
-        door = setIndex(getRandomNum() % height, getRandomNum() % width, ' ');
+        key = setIndex(rand() % height, rand() % width, ' ');
+        door = setIndex(rand() % height, rand() % width, ' ');
         for (int i = 0; i < numOfItems; i++)
         {
-            bomb[i] = setIndex(getRandomNum() % height, getRandomNum() % width, 'b');
-            coin[i] = setIndex(getRandomNum() % height, getRandomNum() % width, 'c');
+            bomb[i] = setIndex(rand() % height, rand() % width, 'b');
+            coin[i] = setIndex(rand() % height, rand() % width, 'c');
         }
     }
     Cell *getIndex(int x, int y)
@@ -321,14 +307,13 @@ public:
 // player class
 class Player
 {
+public:
     int xCor, yCor, distance;
     List coinsCollected, prevPositions;
     bool hasKey;
     int undoMoves;
     int score;
     char playerDirection;
-
-public:
     Player(int xCor = 0, int yCor = 0, int undoMoves = 6)
     {
         this->xCor = xCor;
@@ -338,7 +323,6 @@ public:
         this->score = 0;
         this->playerDirection = ' ';
     }
-
     void collectCoin(int xCor, int yCor)
     {
         coinsCollected.enqueue(xCor, yCor);
@@ -358,76 +342,27 @@ public:
         prevPositions.pop();
         undoMoves--;
     }
+    void setUndoMoves(int moves)
+    {
+        undoMoves = moves;
+    }
     bool canUndo()
     {
         return undoMoves > 0;
-    }
-    // getters
-    int getUndoMoves()
-    {
-        return undoMoves;
-    }
-    int getXCor()
-    {
-        return xCor;
-    }
-    int getYCor()
-    {
-        return yCor;
-    }
-    int getDistance()
-    {
-        return distance;
-    }
-    bool getHasKey()
-    {
-        return hasKey;
-    }
-    int getScore()
-    {
-        return score;
-    }
-    List getCoinsCollected()
-    {
-        return coinsCollected;
-    }
-    List getPrevPositions()
-    {
-        return prevPositions;
-    }
-    char getPlayerDirection()
-    {
-        return playerDirection;
-    }
-    // setters
-    void setUndoMoves(int undoMoves)
-    {
-        this->undoMoves = undoMoves;
-    }
-    void setXCor(int xCor)
-    {
-        this->xCor = xCor;
-    }
-    void setYCor(int yCor)
-    {
-        this->yCor = yCor;
-    }
-    void setHasKey(bool hasKey)
-    {
-        this->hasKey = hasKey;
     }
     void setPlayerDirection(char direction)
     {
         playerDirection = direction;
     }
-    void setUndoMoves(int moves)
+    char getPlayerDirection()
     {
-        undoMoves = moves;
+        return playerDirection;
     }
 };
 // maze class
 class Maze
 {
+public:
     Player player;
     Cell **maze;
     int width, height;
@@ -436,8 +371,6 @@ class Maze
     Grid grid;
     int mode; // 1 for easy, 2 for medium, 3 for hard
     int moves;
-
-public:
     Maze(int mode) : player(0, 0), grid(mode)
     {
         this->mode = mode;
@@ -451,7 +384,7 @@ public:
     }
     void initMaze()
     {
-        grid.setIndex(player.getXCor(), player.getYCor(), 'P');
+        grid.setIndex(player.xCor, player.yCor, 'P');
     }
     void drawMaze()
     {
@@ -460,12 +393,12 @@ public:
     void updatePlayer(int prevXCor, int prevYCor)
     {
         grid.setIndex(prevXCor, prevYCor, ' ');
-        grid.setIndex(player.getXCor(), player.getYCor(), 'P');
+        grid.setIndex(player.xCor, player.yCor, 'P');
     }
     void move(char direction)
     {
-        int prevX = player.getXCor();
-        int prevY = player.getYCor();
+        int prevX = player.xCor;
+        int prevY = player.yCor;
         bool directionSet = false;
         switch (direction)
         {
@@ -482,7 +415,7 @@ public:
             // if previouly opposite direction was entered, dont move
             if (player.getPlayerDirection() == 's')
                 break;
-            player.setYCor(player.getYCor() - 1);
+            player.yCor--;
             moves--;
             player.setPlayerDirection('w');
             directionSet = true;
@@ -490,7 +423,7 @@ public:
         case 's':
             if (player.getPlayerDirection() == 'w')
                 break;
-            player.setYCor(player.getYCor() + 1);
+            player.yCor++;
             moves--;
             player.setPlayerDirection('s');
             directionSet = true;
@@ -498,7 +431,7 @@ public:
         case 'a':
             if (player.getPlayerDirection() == 'd')
                 break;
-            player.setYCor(player.getYCor() - 1);
+            player.xCor--;
             moves--;
             player.setPlayerDirection('a');
             directionSet = true;
@@ -506,7 +439,7 @@ public:
         case 'd':
             if (player.getPlayerDirection() == 'a')
                 break;
-            player.setYCor(player.getYCor() + 1);
+            player.xCor++;
             moves--;
             player.setPlayerDirection('d');
             directionSet = true;
@@ -522,57 +455,56 @@ public:
     void undoMove()
     {
         // go back in stack once if undos available
-        int prevX = player.getXCor();
-        int prevY = player.getYCor();
+        int prevX = player.xCor;
+        int prevY = player.yCor;
         player.undoMove();
         updatePlayer(prevX, prevY);
     }
     void checkBoundary()
     {
-        if (player.getXCor() < 0)
+        if (player.xCor < 0)
         {
-            player.setXCor(0);
+            player.xCor = 0;
         }
-        else if (player.getXCor() >= width)
+        else if (player.xCor >= width)
         {
-            player.setXCor(width - 1);
+            player.xCor = width - 1;
         }
-        if (player.getYCor() < 0)
+        if (player.yCor < 0)
         {
-            player.setYCor(0);
+            player.yCor = 0;
         }
-        else if (player.getYCor() >= height)
+        else if (player.yCor >= height)
         {
-            player.setYCor(height - 1);
+            player.yCor = height - 1;
         }
     }
     void checkCollision()
     {
-        if (grid.playerAndBombCollision(player.getXCor(), player.getYCor()))
+        if (grid.playerAndBombCollision(player.xCor, player.yCor))
         {
             // game over
             printw("Game Over");
             refresh();
             playing = false;
         }
-        else if (grid.playerAndCoinCollision(player.getXCor(), player.getYCor()))
+        else if (grid.playerAndCoinCollision(player.xCor, player.yCor))
         {
             // increase score of player
             // add coin cordinates to players list
             printw("Coin Collected\n");
             refresh();
-            player.collectCoin(player.getXCor(), player.getYCor());
+            player.collectCoin(player.xCor, player.yCor);
         }
-        else if (player.getXCor() == grid.getKey()->xCor &&
-                 player.getYCor() == grid.getKey()->yCor)
+        else if (player.xCor == grid.key->xCor && player.yCor == grid.key->yCor)
         {
-            player.setHasKey(true);
+            player.hasKey = true;
             printw("Key Collected\n");
             refresh();
         }
-        else if (player.getXCor() == grid.getDoor()->xCor && player.getYCor() == grid.getDoor()->yCor)
+        else if (player.xCor == grid.door->xCor && player.yCor == grid.door->yCor)
         {
-            if (player.getHasKey())
+            if (player.hasKey)
             {
                 // game won
                 printw("Game Won");
@@ -597,15 +529,15 @@ public:
         {
             moves = 2;
         }
-        printw("Key at %d , %d\n", grid.getKey()->yCor, grid.getKey()->xCor);
-        printw("Door at %d , %d\n", grid.getDoor()->yCor, grid.getDoor()->xCor);
+        printw("Key at %d , %d\n", grid.key->yCor, grid.key->xCor);
+        printw("Door at %d , %d\n", grid.door->yCor, grid.door->xCor);
 
-        this->distanceOfPlayer = calculateManhattanDistance(grid.getKey());
-        return distanceOfPlayer + calculateManhattanDistance(grid.getKey(), grid.getDoor()) + moves;
+        this->distanceOfPlayer = calculateManhattanDistance(grid.key);
+        return distanceOfPlayer + calculateManhattanDistance(grid.key, grid.door) + moves;
     }
     int calculateManhattanDistance(Cell *object)
     {
-        return abs(object->xCor - player.getXCor()) + abs(object->yCor - player.getYCor());
+        return abs(object->xCor - player.xCor) + abs(object->yCor - player.yCor);
     }
     int calculateManhattanDistance(Cell *key, Cell *door)
     {
@@ -614,10 +546,10 @@ public:
     bool senseDistance(Cell *key, Cell *door)
     {
         int distance = 0;
-        if (player.getHasKey())
-            distance = calculateManhattanDistance(grid.getDoor());
+        if (player.hasKey)
+            distance = calculateManhattanDistance(grid.door);
         else
-            distance = calculateManhattanDistance(grid.getKey());
+            distance = calculateManhattanDistance(grid.key);
 
         if (distance < this->distanceOfPlayer)
         {
@@ -646,44 +578,6 @@ public:
     {
         return moves == 0 || !playing;
     }
-    // setters
-    void setMode(int mode)
-    {
-        this->mode = mode;
-    }
-    void setMoves(int moves)
-    {
-        this->moves = moves;
-    }
-    // getters
-    Player getPlayer()
-    {
-        return player;
-    }
-    Cell **getMaze()
-    {
-        return maze;
-    }
-    Grid getGrid()
-    {
-        return grid;
-    }
-    bool getPlaying()
-    {
-        return playing;
-    }
-    int getDistanceOfPlayer()
-    {
-        return distanceOfPlayer;
-    }
-    int getMode()
-    {
-        return mode;
-    }
-    int getMoves()
-    {
-        return moves;
-    }
 };
 
 int main()
@@ -701,14 +595,15 @@ int main()
     while (!maze.checkGameOver())
     {
         clear();
-        printw("Score: %d\n", maze.getPlayer().getScore());
-        printw("Moves left: %d\n", maze.getMoves());
-        printw("Undo Moves left: %d\n", maze.getPlayer().getUndoMoves());
+        printw("Score: %d\n", maze.player.score);
+        printw("Moves left: %d\n", maze.moves);
+        printw("Undo Moves left: %d\n", maze.player.undoMoves);
+        printw("Key status: %s\n", maze.player.hasKey ? "Collected" : "Not Collected");
         maze.drawMaze();
         printw("Enter direction: ");
         direction = getch();
         maze.move(direction);
-        bool closer = maze.senseDistance(maze.getGrid().getKey(), maze.getGrid().getDoor());
+        bool closer = maze.senseDistance(maze.grid.key, maze.grid.door);
         if (closer)
         {
             printw("Getting warmer\n");
@@ -722,17 +617,17 @@ int main()
         napms(2000);
     }
 
-    printw("Key at %d , %d\n", maze.getGrid().getKey()->yCor, maze.getGrid().getKey()->xCor);
-    printw("Door at %d , %d\n", maze.getGrid().getDoor()->yCor, maze.getGrid().getDoor()->xCor);
+    printw("Key at %d , %d\n", maze.grid.key->yCor, maze.grid.key->xCor);
+    printw("Door at %d , %d\n", maze.grid.door->yCor, maze.grid.door->xCor);
     printw("Coins Collected: \n");
-    maze.getPlayer().getCoinsCollected().printList();
+    maze.player.coinsCollected.printList();
     printw("Previous Positions: \n");
-    maze.getPlayer().getPrevPositions().printList();
-    // Waitingg for a key press
+    maze.player.prevPositions.printList();
+    // refresh();
+    //  Wait for a key press
     getch();
     // ends ncurses
     endwin();
 
     return 0;
 }
-
