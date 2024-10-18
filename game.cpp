@@ -1,7 +1,5 @@
 
 #include <ncurses.h>
-#include <random>
-#include <cmath>
 #include <iostream>
 using namespace std;
 
