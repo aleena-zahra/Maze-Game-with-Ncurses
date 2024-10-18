@@ -52,5 +52,6 @@ Welcome to the **Maze Game Project**! This is a console-based maze game built us
 
 To compile the game, use the following command:
 ```bash
-g++ -o MazeGame main.cpp -lncurses
+g++ -o MazeGame game.cpp -lncurses
 ```
+
