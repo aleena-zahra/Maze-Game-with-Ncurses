@@ -1,7 +1,8 @@
 # Maze Game Project
 
 <div align="center">
-  <img src="https://via.placeholder.com/150" alt="Game Logo" width="200"/>
+  <img src="![image](https://github.com/user-attachments/assets/0d9672da-2368-4129-bce5-bb2157428fbe)
+" alt="Game Logo" width="200"/>
 </div>
 
 ## 🏁 Introduction
