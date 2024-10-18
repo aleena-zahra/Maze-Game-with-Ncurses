@@ -1,4 +1,8 @@
-# Maze Game Project
+<h1 align="center">
+  Maze Game Title
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6NiyPlS7cyuZjD3a8imeXyXVcQ_SJL6oLYw&s" alt="GIF Title" width="40"/>
+</h1>
+
 
 
   <div align="center">
