@@ -1,7 +1,7 @@
 <h1 style="color: rgb(118, 152, 245)", align="left">
   <img src="https://emojis.slackmojis.com/emojis/images/1531849430/4246/blob-sunglasses.gif?1531849430" width="50"/>
   Maze Game
-  <img src="https://i.pinimg.com/originals/d2/85/ba/d285ba2cc51a540ad5d5e06c489ce121.gif" alt="GIF Title" width="80"/>
+  <img src="https://i.pinimg.com/originals/d2/85/ba/d285ba2cc51a540ad5d5e06c489ce121.gif" alt="GIF Title" width="50"/>
 </h1>
 
 <h3 align="left">
@@ -49,7 +49,7 @@ Welcome to the **Maze Game Project**! This is a console-based maze game built us
 | `D` | Move Right     |
 | `U` | Undo Last Move |
 
-## <img src="https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif" width="100"> Setup and Installation
+## Setup and Installation  <img src="https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif" width="100"> 
 
 ### <img src="https://media.giphy.com/media/Ll22OhMLAlVDb8UQWe/giphy.gif" width="50">  Prerequisites
 
