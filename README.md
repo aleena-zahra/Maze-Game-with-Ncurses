@@ -21,7 +21,7 @@
 
 Welcome to the **Maze Game Project**! This is a console-based maze game built using C++ and the `ncurses` library. The game features a grid-based maze with various items (coins, bombs, keys, doors) and a player that can move around, collect items, and avoid obstacles. The player can also undo moves, making it a strategic puzzle-solving experience.
 
-## <img src="https://media.giphy.com/media/VbK2YCQFWdg5nvH5wa/giphy.gif" width="50"> Features
+## <img src="https://media.giphy.com/media/VbK2YCQFWdg5nvH5wa/giphy.gif" width="30"> Features
 
 - **Dynamic Grid Creation**: The game generates a dynamic grid based on the selected difficulty level.
 - **Linked List Data Structures**: Efficiently manage player positions, coins collected, and more.
@@ -59,7 +59,7 @@ Welcome to the **Maze Game Project**! This is a console-based maze game built us
     sudo apt-get install libncurses5-dev libncursesw5-dev
     ```
 
-### <img src="https://media.giphy.com/media/kG9DITGH0UTsnFacyV/giphy.gif" width="50">  Compilation
+### Compilation <img src="https://media.giphy.com/media/kG9DITGH0UTsnFacyV/giphy.gif" width="70"> 
 
 To compile the game, use the following command:
 ```bash
