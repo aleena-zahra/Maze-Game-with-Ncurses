@@ -1,7 +1,9 @@
 # Maze Game Project
 
 
-  ![image](https://github.com/user-attachments/assets/0d9672da-2368-4129-bce5-bb2157428fbe)
+  <div align="center">
+  <img src="https://github.com/user-attachments/assets/0d9672da-2368-4129-bce5-bb2157428fbe" alt="Game Screenshot" width="400"/>
+</div>
 
 
 ## 🏁 Introduction
