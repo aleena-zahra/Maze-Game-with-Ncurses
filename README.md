@@ -4,6 +4,11 @@
 </h1>
 
 
+## Made with ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
+
+
+
+
 
   <div align="center">
   <img src="https://github.com/user-attachments/assets/0d9672da-2368-4129-bce5-bb2157428fbe" alt="Game Screenshot" width="400"/>
