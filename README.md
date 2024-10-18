@@ -1,9 +1,8 @@
 # Maze Game Project
 
-<div align="center">
-  <img src=![image](https://github.com/user-attachments/assets/0d9672da-2368-4129-bce5-bb2157428fbe)
-alt="Game Logo" width="200"/>
-</div>
+
+  ![image](https://github.com/user-attachments/assets/0d9672da-2368-4129-bce5-bb2157428fbe)
+
 
 ## 🏁 Introduction
 
