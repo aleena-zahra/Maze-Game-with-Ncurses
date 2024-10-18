@@ -59,7 +59,7 @@ Welcome to the **Maze Game Project**! This is a console-based maze game built us
     sudo apt-get install libncurses5-dev libncursesw5-dev
     ```
 
-### Compilation <img src="https://media.giphy.com/media/kG9DITGH0UTsnFacyV/giphy.gif" width="70"> 
+### Compilation <img src="https://media.giphy.com/media/kG9DITGH0UTsnFacyV/giphy.gif" width="70" style="float: right;"> 
 
 To compile the game, use the following command:
 ```bash
