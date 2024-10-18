@@ -1,4 +1,4 @@
-
+//Aleena Zahra DS-3B DATA STRUCTURES ASSIGNMENT 2 MAZE GAME
 #include <ncurses.h>
 #include <iostream>
 using namespace std;
@@ -316,7 +316,8 @@ public:
         {
             if (coin[i]->xCor == xCor && coin[i]->yCor == yCor && coin[i]->cellType == 'c')
             {
-                coin[i]->cellType = ' ';
+                //delete this coin
+                
                 return true;
             }
         }
@@ -721,7 +722,12 @@ int main()
     initscr();     // Initialize ncurses
     start_color(); // Start color functionality
     cbreak();      // Disable line buffering
+    WINDOW *menuWin = newwin(10, 40, 4, 4);
+    box(menuWin, 0, 0);
+    keypad(menuWin, TRUE);
     noecho();      // Disable echoing of characters
+    //dont show curser
+    curs_set(0);
     refresh();     // Refresh the screen
     // Define color pairs
     init_pair(1, COLOR_RED, COLOR_BLACK);   // Pair 1: Red text on black background
@@ -729,7 +735,39 @@ int main()
     init_pair(3, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(4, COLOR_BLUE, COLOR_BLACK);
     clear();                                // Clear the screen
-    Maze maze(3);
+    //make game menu that uses keys to select difficulty
+    int highlighted = 0, choice;
+    while(1){
+        printw("Welcome to the Maze Game\n");
+        for(int i =0 ; i<3 ; i++){
+            if(i== highlighted){
+                wattron(menuWin, A_REVERSE);
+            }
+            mvwprintw(menuWin, i+2, 17, "Level %d", i+1);
+            wattroff(menuWin, A_REVERSE);
+        }
+        choice = wgetch(menuWin);
+        switch(choice){
+            case KEY_UP:
+                highlighted--;
+                if(highlighted == -1){
+                    highlighted = 0;
+                }
+                break;
+            case KEY_DOWN:
+                highlighted++;
+                if(highlighted == 3){
+                    highlighted = 2;
+                }
+                break;
+            default:
+                break;
+        }
+        if(choice == 10){
+            break;
+        }
+    }
+    Maze maze(highlighted+1);
     char direction;
     int time = 0;
     while (!maze.checkGameOver())
