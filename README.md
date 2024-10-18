@@ -10,13 +10,6 @@
 </h3>
 
 
-
-
-  <div align="center">
-  <img src="https://github.com/user-attachments/assets/0d9672da-2368-4129-bce5-bb2157428fbe" alt="Game Screenshot" width="400"/>
-</div>
-
-
 ## <img src="https://media.giphy.com/media/VgCDAzcKvsR6OM0uWg/giphy.gif" width="50"> Introduction
 
 Welcome to the **Maze Game Project**! This is a console-based maze game built using C++ and the `ncurses` library. The game features a grid-based maze with various items (coins, bombs, keys, doors) and a player that can move around, collect items, and avoid obstacles. The player can also undo moves, making it a strategic puzzle-solving experience.
@@ -68,18 +61,30 @@ g++ -o MazeGame game.cpp -lncurses
 ```
 # Sample Screenshots <img src="https://media.giphy.com/media/WnCTbHZRwNXS6YtGXv/giphy.gif" width="100"> 
 ### Game Menu
-![image](https://github.com/user-attachments/assets/ed2887ea-66bc-45b8-b505-d5b034d89191)
+ <div align="center">
+  <img src="https://github.com/user-attachments/assets/ed2887ea-66bc-45b8-b505-d5b034d89191" alt="Game Menu" width="400"/>
+</div>
 
 ### Level 1
-![image](https://github.com/user-attachments/assets/5f9b7053-660c-4a4a-84ee-8cfe929e54f5)
-getting warmer:
-![image](https://github.com/user-attachments/assets/fc55463e-f28e-4920-8af4-7e12edc9ce7e)
-getting colder:
-![image](https://github.com/user-attachments/assets/e38a76d3-1b72-4fac-b021-6caa1f1998b3)
+ <div align="center">
+  <img src="https://github.com/user-attachments/assets/5f9b7053-660c-4a4a-84ee-8cfe929e54f5" alt="Game Menu" width="400"/>
+</div>
+Getting warmer:
+ <div align="center">
+  <img src="https://github.com/user-attachments/assets/fc55463e-f28e-4920-8af4-7e12edc9ce7e" alt="Game Menu" width="400"/>
+</div>
+Getting colder:
+ <div align="center">
+  <img src="https://github.com/user-attachments/assets/e38a76d3-1b72-4fac-b021-6caa1f1998b3" alt="Game Menu" width="400"/>
+</div>
 
 ### Level 2
-![image](https://github.com/user-attachments/assets/58aa57cb-01bb-4241-9bc6-fb3d67ba22d6)
+
+ <div align="center">
+  <img src="https://github.com/user-attachments/assets/58aa57cb-01bb-4241-9bc6-fb3d67ba22d6" alt="Game Menu" width="400"/>
+</div>
 
 ### Level 3
-![image](https://github.com/user-attachments/assets/ab98debc-b9dc-40a6-a49c-33b2ff5357b1)
-
+ <div align="center">
+  <img src="https://github.com/user-attachments/assets/ab98debc-b9dc-40a6-a49c-33b2ff5357b1" alt="Game Menu" width="400"/>
+</div>
