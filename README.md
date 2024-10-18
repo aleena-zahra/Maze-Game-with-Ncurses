@@ -1,5 +1,6 @@
 <h1 style="color: rgb(118, 152, 245)", align="left">
-  Maze Game Title
+  <img src="https://emojis.slackmojis.com/emojis/images/1531849430/4246/blob-sunglasses.gif?1531849430" width="50"/>
+  Maze Game
   <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6NiyPlS7cyuZjD3a8imeXyXVcQ_SJL6oLYw&s" alt="GIF Title" width="80"/>
 </h1>
 
@@ -16,7 +17,7 @@
 </div>
 
 
-## 🏁 Introduction
+## <img src="https://media.giphy.com/media/VgCDAzcKvsR6OM0uWg/giphy.gif" width="50"> Introduction
 
 Welcome to the **Maze Game Project**! This is a console-based maze game built using C++ and the `ncurses` library. The game features a grid-based maze with various items (coins, bombs, keys, doors) and a player that can move around, collect items, and avoid obstacles. The player can also undo moves, making it a strategic puzzle-solving experience.
 
