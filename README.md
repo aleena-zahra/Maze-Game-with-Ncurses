@@ -3,10 +3,10 @@
   <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6NiyPlS7cyuZjD3a8imeXyXVcQ_SJL6oLYw&s" alt="GIF Title" width="80"/>
 </h1>
 
-<h2 align="center">
+<h3 align="left">
   Made With Ncurses and 
-  <img src="https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="GIF Title" width="80"/>
-</h2>
+  <img src="https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="GIF Title" width="60"/>
+</h3>
 
 
 
