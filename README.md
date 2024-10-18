@@ -49,7 +49,7 @@ Welcome to the **Maze Game Project**! This is a console-based maze game built us
 | `D` | Move Right   |
 | `U` | Undo Last Move |
 
-## 🛠️ Setup and Installation
+## <img src="https://giphy.com/gifs/cat-kitten-computer-3oKIPnAiaMCws8nOsE" width="50"> Setup and Installation
 
 ### Prerequisites
 
