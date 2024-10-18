@@ -5,6 +5,7 @@
 #include <iostream>
 using namespace std;
 
+#define MAX_TIME 60
 // list class
 struct Node
 {
@@ -27,7 +28,8 @@ class List
 {
 private:
     Node *head;
-    List(const List &list){}
+    List(const List &list) {}
+
 public:
     List()
     {
@@ -158,7 +160,7 @@ struct Cell
     {
         this->xCor = x;
         this->yCor = y;
-        Cell *up = down = right = left =   NULL;
+        Cell *up = down = right = left = NULL;
         this->cellType = ' ';
     }
     ~Cell()
@@ -173,8 +175,9 @@ class Grid
     Cell **bomb, **coin;
     int width, height;
     int numOfItems;
-    Grid(const Grid &grid){}
-    public:
+    Grid(const Grid &grid) {}
+
+public:
     Grid(int mode = 1)
     {
         this->width = this->height = (mode + 1) * 5;
@@ -188,7 +191,8 @@ class Grid
         coin = new Cell *[numOfItems];
         makeGrid();
     }
-    ~Grid(){
+    ~Grid()
+    {
         for (int i = 0; i < height; i++)
         {
             Cell *temp = heads[i];
@@ -327,8 +331,13 @@ class Grid
             Cell *temp = heads[i];
             while (temp != NULL)
             {
-                //  printw("( "<<temp->xCor<<","<<temp->yCor<<" ) ";
-                printw("|%c", temp->cellType);
+                printw("|");
+                if(temp->cellType == 'P')
+                    attron(COLOR_PAIR(3));
+
+                printw("%c", temp->cellType);
+
+                attroff(COLOR_PAIR(3));
                 temp = temp->right;
             }
             printw("|");
@@ -340,8 +349,6 @@ class Grid
     {
         return door;
     }
-
-
 };
 // player class
 class Player
@@ -352,8 +359,9 @@ class Player
     int undoMoves;
     int score;
     char playerDirection;
-    Player(const Player &player){}
-    public:
+    Player(const Player &player) {}
+
+public:
     Player(int xCor = 0, int yCor = 0, int undoMoves = 6)
     {
         this->xCor = xCor;
@@ -396,7 +404,7 @@ class Player
     {
         return undoMoves > 0;
     }
-    //setters
+    // setters
     void setPlayerDirection(char direction)
     {
         playerDirection = direction;
@@ -414,7 +422,7 @@ class Player
         this->hasKey = hasKey;
     }
 
-    //getters
+    // getters
     char getPlayerDirection()
     {
         return playerDirection;
@@ -435,11 +443,11 @@ class Player
     {
         return hasKey;
     }
-    List* getCoinsCollected()
+    List *getCoinsCollected()
     {
         return &coinsCollected;
     }
-    List* getPrevPositions()
+    List *getPrevPositions()
     {
         return &prevPositions;
     }
@@ -447,8 +455,6 @@ class Player
     {
         return undoMoves;
     }
-    
-
 };
 // maze class
 class Maze
@@ -461,7 +467,8 @@ class Maze
     Grid grid;
     int mode; // 1 for easy, 2 for medium, 3 for hard
     int moves;
-    public:
+
+public:
     Maze(int mode) : player(0, 0), grid(mode)
     {
         this->mode = mode;
@@ -478,7 +485,6 @@ class Maze
         // delete grid;
         grid.~Grid();
         player.~Player();
-        
     }
     void initMaze()
     {
@@ -511,56 +517,59 @@ class Maze
             break;
         case 'w':
             // if previouly opposite direction was entered, dont move
-            if (player.getPlayerDirection() == 's'){
+            if (player.getPlayerDirection() == 's')
+            {
                 break;
             }
             {
-            int y = player.getYCor();
-            player.setYCor(y - 1);
-            moves--;
-            player.setPlayerDirection('w');
-            directionSet = true;
+                int y = player.getYCor();
+                player.setYCor(y - 1);
+                moves--;
+                player.setPlayerDirection('w');
+                directionSet = true;
             }
             break;
         case 's':
-            if (player.getPlayerDirection() == 'w'){
+            if (player.getPlayerDirection() == 'w')
+            {
                 break;
             }
             {
-            int y = player.getYCor();
-            player.setYCor(y + 1);
-            moves--;
-            player.setPlayerDirection('s');
-            directionSet = true;
+                int y = player.getYCor();
+                player.setYCor(y + 1);
+                moves--;
+                player.setPlayerDirection('s');
+                directionSet = true;
             }
             break;
         case 'a':
-            if (player.getPlayerDirection() == 'd'){
+            if (player.getPlayerDirection() == 'd')
+            {
                 break;
             }
             {
-            int x = player.getXCor();
-            player.setXCor(x - 1);
-            moves--;
-            player.setPlayerDirection('a');
-            directionSet = true;
+                int x = player.getXCor();
+                player.setXCor(x - 1);
+                moves--;
+                player.setPlayerDirection('a');
+                directionSet = true;
             }
             break;
 
         case 'd':
-            if (player.getPlayerDirection() == 'a'){
+            if (player.getPlayerDirection() == 'a')
+            {
                 break;
             }
             {
-            int x = player.getXCor();
-            player.setXCor(x + 1);
-            moves--;
-            player.setPlayerDirection('d');
-            directionSet = true;
+                int x = player.getXCor();
+                player.setXCor(x + 1);
+                moves--;
+                player.setPlayerDirection('d');
+                directionSet = true;
             }
             break;
         }
-        printw("Moves left: %d\n", moves);
         refresh();
         checkBoundary();
         updatePlayer(prevX, prevY);
@@ -581,15 +590,15 @@ class Maze
         {
             player.setXCor(0);
         }
-        else if (player.getXCor()  >= width)
+        else if (player.getXCor() >= width)
         {
             player.setXCor(width - 1);
         }
-        if (player.getYCor()  < 0)
+        if (player.getYCor() < 0)
         {
             player.setYCor(0);
         }
-        else if (player.getYCor()  >= height)
+        else if (player.getYCor() >= height)
         {
             player.setYCor(height - 1);
         }
@@ -607,7 +616,7 @@ class Maze
         {
             // increase score of player
             // add coin cordinates to players list
-            
+
             printw("Coin Collected\n");
             refresh();
             player.collectCoin(player.getXCor(), player.getYCor());
@@ -694,12 +703,12 @@ class Maze
     {
         return moves == 0 || !playing;
     }
-    //getters
-    Grid* getGrid()
+    // getters
+    Grid *getGrid()
     {
         return &grid;
     }
-    Player* getPlayer()
+    Player *getPlayer()
     {
         return &player;
     }
@@ -711,36 +720,54 @@ class Maze
 
 int main()
 {
-    initscr();
-    // Print to the screen
-    cbreak(); // Disable line buffering
-    noecho();
-    // Refresh the screen
-    refresh();
-
+    initscr();     // Initialize ncurses
+    start_color(); // Start color functionality
+    cbreak();      // Disable line buffering
+    noecho();      // Disable echoing of characters
+    refresh();     // Refresh the screen
+    // Define color pairs
+    init_pair(1, COLOR_RED, COLOR_BLACK);   // Pair 1: Red text on black background
+    init_pair(2, COLOR_GREEN, COLOR_BLACK); // Pair 2: Green text on black background
+    init_pair(3, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(4, COLOR_BLUE, COLOR_BLACK);
+    clear();                                // Clear the screen
     Maze maze(3);
     char direction;
-
+    int time = 0;
     while (!maze.checkGameOver())
     {
         clear();
+        if (time++ > MAX_TIME)
+        {
+            printw("YOU RAN OUT OF TIME!\nGAME OVER\n");
+            break;
+        }
+        int timeLeft = MAX_TIME - time;
+        attron(COLOR_PAIR(1)); // turn on the attribute of color pair 1
+        printw("Time Left: %d\n", timeLeft);
         printw("Score: %d\n", maze.getPlayer()->getScore());
         printw("Moves left: %d\n", maze.getMoves());
         printw("Undo Moves left: %d\n", maze.getPlayer()->getUndoMoves());
-        printw("Key status: %s\n", maze.getPlayer()->getHasKey() ? "Collected" : "Not Collected");
+        printw("Key status: %s\n", maze.getPlayer()->getHasKey() ? "Collected\n\n" : "Not Collected\n\n");
+        attroff(COLOR_PAIR(1)); // turn off the attribute of color pair 1
         maze.drawMaze();
-        printw("Enter direction: ");
+        attron(COLOR_PAIR(2)); // turn on the attribute of color pair 2
+        printw("Enter direction(W/A/S/D/U): ");
+        attroff(COLOR_PAIR(2)); // turn off the attribute of color pair 2
         direction = getch();
         maze.move(direction);
         bool closer = maze.senseDistance(maze.getGrid()->getKey(), maze.getGrid()->getDoor());
-        if (closer)
-        {
+        if (closer){
+            attron(COLOR_PAIR(1));
             printw("Getting warmer\n");
+            attroff(COLOR_PAIR(1));
         }
-        else
-        {
+        else {
+            attron(COLOR_PAIR(4));
             printw("Getting colder\n");
+            attroff(COLOR_PAIR(4));
         }
+        
         refresh();
         maze.checkCollision();
         napms(2000);
