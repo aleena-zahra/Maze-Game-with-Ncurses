@@ -312,8 +312,9 @@ class Grid
     {
         for (int i = 0; i < numOfItems; i++)
         {
-            if (coin[i]->xCor == xCor && coin[i]->yCor == yCor)
+            if (coin[i]->xCor == xCor && coin[i]->yCor == yCor && coin[i]->cellType == 'c')
             {
+                coin[i]->cellType = ' ';
                 return true;
             }
         }
@@ -606,6 +607,7 @@ class Maze
         {
             // increase score of player
             // add coin cordinates to players list
+            
             printw("Coin Collected\n");
             refresh();
             player.collectCoin(player.getXCor(), player.getYCor());
@@ -716,7 +718,7 @@ int main()
     // Refresh the screen
     refresh();
 
-    Maze maze(1);
+    Maze maze(3);
     char direction;
 
     while (!maze.checkGameOver())
@@ -744,8 +746,8 @@ int main()
         napms(2000);
     }
 
-    printw("Key at %d , %d\n", maze.getGrid()->getKey()->yCor, maze.getGrid()->getKey()->xCor);
-    printw("Door at %d , %d\n", maze.getGrid()->getDoor()->yCor, maze.getGrid()->getDoor()->xCor);
+    printw("Key at y:%d ,x: %d\n", maze.getGrid()->getKey()->yCor, maze.getGrid()->getKey()->xCor);
+    printw("Door at y:%d , x:%d\n", maze.getGrid()->getDoor()->yCor, maze.getGrid()->getDoor()->xCor);
     printw("Coins Collected: \n");
     maze.getPlayer()->getCoinsCollected()->printList();
     printw("Previous Positions: \n");
