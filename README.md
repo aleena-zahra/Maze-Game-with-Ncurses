@@ -21,14 +21,14 @@
 
 Welcome to the **Maze Game Project**! This is a console-based maze game built using C++ and the `ncurses` library. The game features a grid-based maze with various items (coins, bombs, keys, doors) and a player that can move around, collect items, and avoid obstacles. The player can also undo moves, making it a strategic puzzle-solving experience.
 
-## 🚀 Features
+## <img src="https://media.giphy.com/media/VbK2YCQFWdg5nvH5wa/giphy.gif" width="50"> Features
 
 - **Dynamic Grid Creation**: The game generates a dynamic grid based on the selected difficulty level.
 - **Linked List Data Structures**: Efficiently manage player positions, coins collected, and more.
 - **Undo Mechanism**: Limited undo moves for strategic gameplay.
 - **Random Item Placement**: Items like bombs, coins, keys, and doors are placed at random positions.
 
-## 📜 How It Works
+##  <img src="https://media.giphy.com/media/JoaeMGYYkHpC/giphy.gif" width="50"> How It Works
 
 1. **Linked List Management**: 
     - Utilizes custom linked list classes (`List` and `Node`) to manage player movements, item placements, and more.
@@ -39,19 +39,19 @@ Welcome to the **Maze Game Project**! This is a console-based maze game built us
 4. **Maze Class**: 
     - Integrates everything together, initializes the maze, and handles game logic.
 
-## 🎮 Game Controls
+## <img src="https://media.giphy.com/media/KOLIHpiF4BVzQBUYUt/giphy.gif" width="50"> Game Controls 🎮
 
-| Key | Action       |
-|-----|--------------|
-| `W` | Move Up      |
-| `S` | Move Down    |
-| `A` | Move Left    |
-| `D` | Move Right   |
+| Key | Action         |
+|-----|----------------|
+| `W` | Move Up        |
+| `S` | Move Down      |
+| `A` | Move Left      |
+| `D` | Move Right     |
 | `U` | Undo Last Move |
 
 ## <img src="https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif" width="100"> Setup and Installation
 
-### Prerequisites
+### <img src="https://media.giphy.com/media/Ll22OhMLAlVDb8UQWe/giphy.gif" width="50">  Prerequisites
 
 - Ensure you have `g++` installed on your system.
 - Install `ncurses` library: 
@@ -59,7 +59,7 @@ Welcome to the **Maze Game Project**! This is a console-based maze game built us
     sudo apt-get install libncurses5-dev libncursesw5-dev
     ```
 
-### Compilation
+### <img src="https://media.giphy.com/media/kG9DITGH0UTsnFacyV/giphy.gif" width="50">  Compilation
 
 To compile the game, use the following command:
 ```bash
