@@ -1,7 +1,7 @@
 <h1 style="color: rgb(118, 152, 245)", align="left">
   <img src="https://emojis.slackmojis.com/emojis/images/1531849430/4246/blob-sunglasses.gif?1531849430" width="50"/>
   Maze Game
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6NiyPlS7cyuZjD3a8imeXyXVcQ_SJL6oLYw&s" alt="GIF Title" width="80"/>
+  <img src="https://i.pinimg.com/originals/d2/85/ba/d285ba2cc51a540ad5d5e06c489ce121.gif" alt="GIF Title" width="80"/>
 </h1>
 
 <h3 align="left">
