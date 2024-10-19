@@ -2,19 +2,33 @@
 #include <ncurses.h>
 #include <iostream>
 using namespace std;
-
 #define MAX_TIME 60
+//make static variable
+static int num = 103;
+int generateRandomNum()
+{
+    num = (num * 1103515245 + 12345)  & 0x7FFFFFFF;
+    return num;
+}
 // list class
 struct Node
 {
     int xCor, yCor;
+    char cellType;
     Node *link;
 
-    Node(int xCor = 0, int yCor = 0)
+    Node(int xCor = 0, int yCor = 0,char cellType = ' ')
     {
         this->xCor = xCor;
         this->yCor = yCor;
+        cellType = cellType;
         this->link = NULL;
+    }
+    void setIndex(int x,int y,char type)
+    {
+        this->xCor = x;
+        this->yCor = y;
+        this->cellType = type;
     }
     ~Node()
     {
@@ -46,10 +60,10 @@ public:
         head = NULL;
     }
     // insert functions
-    void push(int xCor, int yCor)
+    void push(int xCor, int yCor,char cellType=' ')
     {
         // create new node and set its values
-        Node *newNode = new Node(xCor, yCor);
+        Node *newNode = new Node(xCor, yCor,cellType);
 
         if (isEmpty())
         {
@@ -120,7 +134,39 @@ public:
         secondLast->link = NULL;
         return true;
     }
-
+    void deleteAtIndex(int index){
+        if(index==0){
+            pop();
+            return;
+        }
+        Node *temp = head;
+        for(int i = 0; temp!=NULL && i<index-1;i++){
+            temp = temp->link;
+        }
+        //now at index-1 of what to delete
+        if(temp==NULL || temp->link == NULL){
+            return;
+        }
+        Node *next = temp->link->link;
+        delete temp->link;
+        printw("Deleted at index %d\n",index);
+        temp->link = next;
+        
+    }
+    int find(int xCor,int yCor,char cellType=' '){
+        Node *temp = head;
+        int index = -1;
+        while(temp!=NULL){
+            index++;
+            if(temp->xCor ==xCor && temp->yCor == yCor && temp->cellType == cellType){ 
+                return index;
+            }
+            temp = temp->link;
+        }
+        if(temp!=NULL)
+           return index; 
+        return -1;
+    }
     bool isEmpty()
     {
         return head == NULL;
@@ -169,8 +215,8 @@ struct Cell
 class Grid
 {
     Cell **heads;
-    Cell *door, *key;
-    Cell **bomb, **coin;
+    Node door, key;
+    List bomb, coin;
     int width, height;
     int numOfItems;
     Grid(const Grid &grid) {}
@@ -185,8 +231,6 @@ public:
             heads[i] = NULL;
         }
         numOfItems = mode * 2;
-        bomb = new Cell *[numOfItems];
-        coin = new Cell *[numOfItems];
         makeGrid();
     }
     ~Grid()
@@ -202,19 +246,9 @@ public:
             }
         }
         delete[] heads;
-        for (int i = 0; i < numOfItems; i++)
-        {
-            delete bomb[i];
-            delete coin[i];
-        }
-        delete[] bomb;
-        delete[] coin;
-        heads = bomb = NULL;
-        coin = NULL;
     }
     void insertNodeAtHead(int xCor, int yCor)
     {
-        // create new Carriage and set its values
         Cell *newCell = new Cell(xCor, yCor);
 
         if (heads[yCor] == NULL)
@@ -264,12 +298,41 @@ public:
     void setItems()
     {
         // Generate random coordinates for bomb, coin, key, and door
-        key = setIndex(rand() % height, rand() % width, ' ');
-        door = setIndex(rand() % height, rand() % width, ' ');
+        key.setIndex(generateRandomNum() % height, generateRandomNum() % width, ' ');
+        door.setIndex(generateRandomNum() % height, generateRandomNum() % width, ' ');
+        setCollectibles();
+    }
+    int getHeight(){
+        return height;
+    }
+    int getWidth(){
+        return width;
+    }
+    void setCollectibles(){
         for (int i = 0; i < numOfItems; i++)
         {
-            bomb[i] = setIndex(rand() % height, rand() % width, 'b');
-            coin[i] = setIndex(rand() % height, rand() % width, 'c');
+            int x,y;
+            do{
+            x = generateRandomNum() % height;
+            y = generateRandomNum() % width;
+            }while(getIndex(x,y)->cellType != ' ');
+
+            printw("Bomb at %d , %d\n", x, y);
+            bomb.push(x,y,'b');
+            setIndex(x,y,'b');
+
+            //coins
+            do{
+            x = generateRandomNum() % height;
+            y = generateRandomNum() % width;
+            }while(getIndex(x,y)->cellType != ' ');
+
+            printw("Coin at %d , %d\n", x, y);
+            refresh();
+            //pause screen
+            napms(2000);
+            coin.push(x,y,'c');
+            setIndex(x,y,'c');
         }
     }
     Cell *getIndex(int x, int y)
@@ -295,32 +358,26 @@ public:
         }
         return cell;
     }
-    Cell *getKey()
+    Node *getKey()
     {
-        return key;
+        return &key;
     }
     bool playerAndBombCollision(int xCor, int yCor)
     {
-        for (int i = 0; i < numOfItems; i++)
-        {
-            if (bomb[i]->xCor == xCor && bomb[i]->yCor == yCor)
-            {
-                return true;
-            }
-        }
-        return false;
+        //figure out another way to check collisions
+            return getIndex(xCor,yCor)->cellType == 'b';
     }
     bool playerAndCoinCollision(int xCor, int yCor)
     {
-        for (int i = 0; i < numOfItems; i++)
-        {
-            if (coin[i]->xCor == xCor && coin[i]->yCor == yCor && coin[i]->cellType == 'c')
+        int index = coin.find(xCor,yCor);
+            if (getIndex(xCor,yCor)->cellType == 'c')
             {
-                //delete this coin
-                
+                printw("Coin and player collide\n");
+                refresh();
+                coin.deleteAtIndex(index);
                 return true;
             }
-        }
+        
         return false;
     }
     void printGrid()
@@ -335,6 +392,7 @@ public:
                     attron(COLOR_PAIR(3));
 
                 printw("%c", temp->cellType);
+                
 
                 attroff(COLOR_PAIR(3));
                 temp = temp->right;
@@ -344,9 +402,9 @@ public:
         }
         printw("\n");
     }
-    Cell *getDoor()
+    Node* getDoor()
     {
-        return door;
+        return &door;
     }
 };
 // player class
@@ -459,7 +517,6 @@ public:
 class Maze
 {
     Player player;
-    Cell **maze;
     int width, height;
     bool playing;
     int distanceOfPlayer;
@@ -571,9 +628,12 @@ public:
         }
         refresh();
         checkBoundary();
+        checkCollision();
         updatePlayer(prevX, prevY);
-        if (directionSet)
+        if (directionSet){
             player.pushPosition(prevX, prevY);
+        }
+        
     }
     void undoMove()
     {
@@ -659,15 +719,15 @@ public:
         this->distanceOfPlayer = calculateManhattanDistance(grid.getKey());
         return distanceOfPlayer + calculateManhattanDistance(grid.getKey(), grid.getDoor()) + moves;
     }
-    int calculateManhattanDistance(Cell *object)
+    int calculateManhattanDistance(Node *object)
     {
         return abs(object->xCor - player.getXCor()) + abs(object->yCor - player.getYCor());
     }
-    int calculateManhattanDistance(Cell *key, Cell *door)
+    int calculateManhattanDistance(Node *key, Node *door)
     {
         return abs(door->xCor - key->xCor) + abs(door->yCor - key->yCor);
     }
-    bool senseDistance(Cell *key, Cell *door)
+    bool senseDistance(Node *key, Node *door)
     {
         int distance = 0;
         if (player.getHasKey())
@@ -715,6 +775,18 @@ public:
     {
         return moves;
     }
+    void refreshItems(){
+        //remove coins and bombs
+        for(int i =0 ; i<grid.getHeight();i++){
+            for(int j = 0; j<grid.getWidth();j++){
+                if(grid.getIndex(i,j)->cellType == 'c' || grid.getIndex(i,j)->cellType == 'b'){
+                    grid.setIndex(i,j,' ');
+                }
+            }
+        }
+        grid.setCollectibles();
+    }
+    
 };
 
 int main()
@@ -784,7 +856,7 @@ int main()
         printw("Score: %d\n", maze.getPlayer()->getScore());
         printw("Moves left: %d\n", maze.getMoves());
         printw("Undo Moves left: %d\n", maze.getPlayer()->getUndoMoves());
-        printw("Key status: %s\n", maze.getPlayer()->getHasKey() ? "Collected\n\n" : "Not Collected\n\n");
+        printw("Key status: %s\n", maze.getPlayer()->getHasKey() ? "Collected" : "Not Collected");
         attroff(COLOR_PAIR(1)); // turn off the attribute of color pair 1
         maze.drawMaze();
         attron(COLOR_PAIR(2)); // turn on the attribute of color pair 2
@@ -803,9 +875,12 @@ int main()
             printw("Getting colder\n");
             attroff(COLOR_PAIR(4));
         }
+        if(time%5==0){
+            maze.refreshItems();
+        }
         
         refresh();
-        maze.checkCollision();
+        //maze.checkCollision();
         napms(2000);
     }
 
