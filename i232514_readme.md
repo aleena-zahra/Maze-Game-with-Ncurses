@@ -62,7 +62,7 @@ g++ -o MazeGame game.cpp -lncurses
 # Sample Screenshots <img src="https://media.giphy.com/media/WnCTbHZRwNXS6YtGXv/giphy.gif" width="100"> 
 ### Game Menu
  <div align="center">
-  <img src="https://github.com/user-attachments/assets/ed2887ea-66bc-45b8-b505-d5b034d89191" alt="Game Menu" width="400"/>
+  <img src="https://github.com/user-attachments/assets/bcb1235a-1155-4603-9d1d-cd6f0d1a649a" alt="Game Menu" width="400"/>
 </div>
 
 ### Level 1
