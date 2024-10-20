@@ -844,7 +844,6 @@ int main()
     // Refresh windows to display content
     refresh();      // Refresh the main screen
     wrefresh(startWin); // Display the startWin content
-    napms(5000);
     while(1){
         for(int i =0 ; i<3 ; i++){
             if(i== highlighted){
