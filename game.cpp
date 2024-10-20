@@ -200,11 +200,12 @@ struct Cell
     Cell *down;
     Cell *right;
     Cell *left;
+    Cell *childList;
     Cell(int x = 0, int y = 0)
     {
         this->xCor = x;
         this->yCor = y;
-        Cell *up = down = right = left = NULL;
+        Cell *up = down = right = left = childList = NULL;
         this->cellType = ' ';
     }
     ~Cell()
@@ -214,7 +215,8 @@ struct Cell
 };
 class Grid
 {
-    Cell **heads;
+    Cell *head;
+    Cell *originalGrid;
     Node door, key;
     List bomb, coin;
     int width, height;
@@ -225,78 +227,90 @@ public:
     Grid(int mode = 1)
     {
         this->width = this->height = (mode + 1) * 5;
-        heads = new Cell *[height];
-        for (int i = 0; i < height; i++)
-        {
-            heads[i] = NULL;
-        }
         numOfItems = mode * 2;
         makeGrid();
     }
     ~Grid()
     {
-        for (int i = 0; i < height; i++)
-        {
-            Cell *temp = heads[i];
-            while (temp != NULL)
-            {
-                Cell *next = temp->right;
-                delete temp;
-                temp = next;
+        Cell *row = head;
+        while (row != NULL) {
+            Cell *current = row;
+            row = row->childList; // Move to the next row
+            while (current != NULL) {
+                Cell *nextCell = current->right;
+                delete current;
+                current = nextCell;
             }
         }
-        delete[] heads;
-    }
-    void insertNodeAtHead(int xCor, int yCor)
-    {
-        Cell *newCell = new Cell(xCor, yCor);
-
-        if (heads[yCor] == NULL)
-        {
-            heads[yCor] = newCell;
-        }
-        else
-        {
-
-            newCell->right = heads[yCor];
-            heads[yCor]->left = newCell;
-            heads[yCor] = newCell;
+        row = originalGrid;
+        while (row != NULL) {
+            Cell *current = row;
+            row = row->childList; // Move to the next row
+            while (current != NULL) {
+                Cell *nextCell = current->right;
+                delete current;
+                current = nextCell;
+            }
         }
     }
+  
     void makeGrid()
     {
         // implementing a nested linked list by making a linked list of linked lists
-        // make height number of linked lists and get their heads
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = width - 1; j >= 0; j--)
-            {
-                insertNodeAtHead(j, i);
+        // make height number of linked lists
+        //in a loop, first set prev row, prev cell and current list's head to null
+        Cell *prevRow = NULL;
+        for (int y = 0; y < height; y++) {
+            Cell *prevCell = NULL;
+            Cell *currentListHead = NULL;
+            for (int x = 0; x < width; x++) {
+                Cell *newCell = new Cell(x, y);
+                // Set the top-left corner
+                if (x == 0 && y == 0) {
+                    head = newCell;
+                    originalGrid = newCell;
+                }   
+                // Connect right and left
+                if (prevCell != NULL) {
+                    prevCell->right = newCell;
+                    newCell->left = prevCell;
+                }
+                // Connect up and down
+                if (prevRow != NULL) {
+                    Cell *aboveCell = prevRow;
+                    for (int i = 0; i < x; i++) {
+                        if (aboveCell->right != NULL) {
+                            aboveCell = aboveCell->right;
+                        }
+                    }
+                    newCell->up = aboveCell;
+                    aboveCell->down = newCell;
+                }
+                // Move to the next cell in the row
+                prevCell = newCell;
+                // Mark the head of this row
+                if (x == 0) {
+                    currentListHead = newCell;
+                }
             }
-            printw("\n");
+
+            // Link this row to the previous row using childList
+            if (prevRow != NULL) {
+                prevRow->childList = currentListHead;
+            }
+
+            // Move to the next row
+            prevRow = currentListHead;
         }
-        // connect the cells in each linked list
-        // connect the linked lists by connecting their heads
-        linkCells();
+
+        // Set items on the grid (coins, bombs, key, door)
         setItems();
     }
-    void linkCells()
-    {
-        for (int i = 0; i < height - 1; i++)
-        {
-            Cell *curr = heads[i];
-            Cell *next = heads[i + 1];
-            while (next != NULL && curr != NULL)
-            {
-                curr->down = next;
-                next->up = curr;
-                curr = curr->right;
-                next = next->right;
-            }
-        }
-    }
+    
     void setItems()
     {
+        //make a copy of grid and store as original grid
+        
         // Generate random coordinates for bomb, coin, key, and door
         key.setIndex(generateRandomNum() % height, generateRandomNum() % width, ' ');
         door.setIndex(generateRandomNum() % height, generateRandomNum() % width, ' ');
@@ -309,8 +323,11 @@ public:
         return width;
     }
     void setCollectibles(){
+        printw("generating coins and bombs\n");
+        refresh(); 
+        napms(2000);
         for (int i = 0; i < numOfItems; i++)
-        {
+        {   
             int x,y;
             do{
             x = generateRandomNum() % height;
@@ -326,29 +343,28 @@ public:
             x = generateRandomNum() % height;
             y = generateRandomNum() % width;
             }while(getIndex(x,y)->cellType != ' ');
-
-            printw("Coin at %d , %d\n", x, y);
-            refresh();
             //pause screen
-            napms(2000);
             coin.push(x,y,'c');
             setIndex(x,y,'c');
         }
     }
-    Cell *getIndex(int x, int y)
-    {
-        Cell *temp = heads[y];
-        while (temp != NULL)
-        {
-            if (temp->xCor == x)
-            {
-                return temp;
-            }
-            temp = temp->right;
+   
+    Cell *getIndex(int x, int y) {
+        Cell *currentRow = head;
+        // Move down y rows
+        for (int i = 0; i < y && currentRow != NULL; i++) {
+            currentRow = currentRow->childList;
         }
-        printw("Index Not Found");
-        return NULL;
+        if (currentRow == NULL) return NULL;
+
+        // Move right x columns
+        Cell *current = currentRow;
+        for (int j = 0; j < x && current != NULL; j++) {
+            current = current->right;
+        }
+        return current;
     }
+
     Cell *setIndex(int x, int y, char type)
     {
         Cell *cell = getIndex(x, y);
@@ -374,37 +390,38 @@ public:
             {
                 printw("Coin and player collide\n");
                 refresh();
-                coin.deleteAtIndex(index);
                 return true;
             }
         
         return false;
     }
-    void printGrid()
-    {
-        for (int i = 0; i < height; i++)
-        {
-            Cell *temp = heads[i];
-            while (temp != NULL)
-            {
-                printw("|");
-                if(temp->cellType == 'P')
-                    attron(COLOR_PAIR(3));
-
-                printw("%c", temp->cellType);
-                
-
-                attroff(COLOR_PAIR(3));
-                temp = temp->right;
-            }
+    void printGrid() {
+    Cell *currentRow = head;
+    while (currentRow != NULL) {
+        Cell *temp = currentRow;
+        while (temp != NULL) {
             printw("|");
-            printw("\n");
+            if (temp->cellType == 'P')
+                attron(COLOR_PAIR(3));
+
+            printw("%c", temp->cellType);
+
+            attroff(COLOR_PAIR(3));
+            temp = temp->right; // Move to the next cell in the row
         }
+        printw("|");
         printw("\n");
+        currentRow = currentRow->childList; // Move to the next row
     }
+    printw("\n");
+}
+
     Node* getDoor()
     {
         return &door;
+    }
+    void printOriginalGrid(){
+        Cell *temp = originalGrid;
     }
 };
 // player class
@@ -794,8 +811,11 @@ int main()
     initscr();     // Initialize ncurses
     start_color(); // Start color functionality
     cbreak();      // Disable line buffering
-    WINDOW *menuWin = newwin(10, 40, 4, 4);
+    int row=20,col=72;
+    WINDOW *menuWin = newwin(10, 40, 6, 20);
+    WINDOW *startWin = newwin(row,col, 4, 4);
     box(menuWin, 0, 0);
+    box(startWin, 0, 0);
     keypad(menuWin, TRUE);
     noecho();      // Disable echoing of characters
     //dont show curser
@@ -806,11 +826,26 @@ int main()
     init_pair(2, COLOR_GREEN, COLOR_BLACK); // Pair 2: Green text on black background
     init_pair(3, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(4, COLOR_BLUE, COLOR_BLACK);
+    init_pair(5, COLOR_MAGENTA, COLOR_WHITE);
     clear();                                // Clear the screen
     //make game menu that uses keys to select difficulty
     int highlighted = 0, choice;
+    // Print welcome message and description on startWin
+    wattron(startWin, COLOR_PAIR(5));
+    int length=10;
+    mvwprintw(startWin, 1, (col - 24) / 2, "Welcome to the Maze Game"); // Centered title
+    mvwprintw(startWin, 4+length, 2, "Trapped in a dark maze, you can only see the ground beneath your feet.");
+    mvwprintw(startWin, 5+length, 2, "Somewhere in the shadows, a hidden key unlocks the way out,");
+    mvwprintw(startWin, 6+length, 2, "but you can't see it, and you don't know where it is.");
+    mvwprintw(startWin, 7+length, 2, "You can sense when you're moving closer to the key,");
+    mvwprintw(startWin, 8+length, 2, "guiding your steps through the darkness.");
+    wattroff(startWin, COLOR_PAIR(5));
+
+    // Refresh windows to display content
+    refresh();      // Refresh the main screen
+    wrefresh(startWin); // Display the startWin content
+    napms(5000);
     while(1){
-        printw("Welcome to the Maze Game\n");
         for(int i =0 ; i<3 ; i++){
             if(i== highlighted){
                 wattron(menuWin, A_REVERSE);
