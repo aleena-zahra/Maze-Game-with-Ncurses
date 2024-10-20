@@ -812,8 +812,8 @@ int main()
     start_color(); // Start color functionality
     cbreak();      // Disable line buffering
     int row=20,col=72;
-    WINDOW *menuWin = newwin(10, 40, 6, 20);
-    WINDOW *startWin = newwin(row,col, 4, 4);
+    WINDOW *menuWin = newwin(10, 40, 5, 20);
+    WINDOW *startWin = newwin(row,col, 2, 4);
     box(menuWin, 0, 0);
     box(startWin, 0, 0);
     keypad(menuWin, TRUE);
@@ -827,11 +827,14 @@ int main()
     init_pair(3, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(4, COLOR_BLUE, COLOR_BLACK);
     init_pair(5, COLOR_MAGENTA, COLOR_WHITE);
+    init_pair(6, COLOR_BLUE, COLOR_WHITE);
     clear();                                // Clear the screen
     //make game menu that uses keys to select difficulty
     int highlighted = 0, choice;
     // Print welcome message and description on startWin
-    wattron(startWin, COLOR_PAIR(5));
+    //wattron(startWin, COLOR_PAIR(5));
+    wbkgd(startWin, COLOR_PAIR(5));
+    wbkgd(menuWin, COLOR_PAIR(6));
     int length=10;
     mvwprintw(startWin, 1, (col - 24) / 2, "Welcome to the Maze Game"); // Centered title
     mvwprintw(startWin, 4+length, 2, "Trapped in a dark maze, you can only see the ground beneath your feet.");
@@ -839,7 +842,7 @@ int main()
     mvwprintw(startWin, 6+length, 2, "but you can't see it, and you don't know where it is.");
     mvwprintw(startWin, 7+length, 2, "You can sense when you're moving closer to the key,");
     mvwprintw(startWin, 8+length, 2, "guiding your steps through the darkness.");
-    wattroff(startWin, COLOR_PAIR(5));
+  //  wattroff(startWin, COLOR_PAIR(5));
 
     // Refresh windows to display content
     refresh();      // Refresh the main screen
